@@ -1,0 +1,3 @@
+method: getMachines
+params:
+  runnerUid: electricity

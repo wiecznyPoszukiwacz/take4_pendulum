@@ -1,0 +1,3 @@
+method: getRunnerStatus
+params:
+  runnerUid: electricity

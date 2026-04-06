@@ -1,0 +1,4 @@
+method: readMachineConfig
+params:
+  machineUid: solp02
+  settingName: foo

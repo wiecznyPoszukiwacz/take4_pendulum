@@ -1,0 +1,5 @@
+method: configureMachine
+params:
+  machineUid: solp02
+  settingName: foo
+  value: ghee

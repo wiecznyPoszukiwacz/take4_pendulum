@@ -1,0 +1,3 @@
+method: debugMachinesList
+params:
+  runnerUid: electricity

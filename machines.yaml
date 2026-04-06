@@ -1,0 +1,20 @@
+machines:
+  - uid: solp01
+    runner: electricity
+    library: GenericMachine
+    configuration: ~
+
+  - uid: solp02
+    runner: electricity
+    library: GenericMachine
+    configuration: ~
+
+  - uid: accu01
+    runner: electricity
+    library: GenericMachine
+    configuration: ~
+  - uid: rcon004
+    runner: electricity
+    library: RainCollector
+    configuration:
+      area: 1
