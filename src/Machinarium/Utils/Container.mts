@@ -13,6 +13,11 @@ export class Container {
 
 		this.registry = registry
 		this.key = key
+
+		const result = registry.machineRead(key)
+		if (result.ok && typeof result.value === 'number') {
+			this.currentValue = result.value as number
+		}
 	}
 
 	public accept(value: number) {

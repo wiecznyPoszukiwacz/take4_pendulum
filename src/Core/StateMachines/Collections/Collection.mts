@@ -3,6 +3,7 @@ import { GenericMachine } from "../Machines/GenericMachine.mjs"
 import { Library } from "../../Utils/Library.mjs"
 import { MachinesPersistencyYaml } from "../../Persistency/MachinesPersistency.mjs"
 import type { TMachineConfig } from "../../Persistency/types.mjs"
+import type { RegistryPersistence } from "../../Registry/Persistence/RegistryPersistence.mjs"
 
 export class MachineCollection {
 
@@ -12,11 +13,12 @@ export class MachineCollection {
 	/** Creates a MachineCollection by loading machine definitions from YAML via persistency and instantiating them via library */
 	public static async create(
 		persistency: MachinesPersistencyYaml,
-		library: Library<GenericMachine>
+		library: Library<GenericMachine>,
+		registryPersistence?: RegistryPersistence
 	): Promise<MachineCollection> {
 
 		const collection = new MachineCollection()
-		await collection.init(persistency, library)
+		await collection.init(persistency, library, registryPersistence)
 
 		return collection
 
@@ -30,12 +32,13 @@ export class MachineCollection {
 	/** Instantiates a single machine using library to resolve its class, then registers it in the collection */
 	protected async createMachine(
 		config: TMachineConfig,
-		library: Library<GenericMachine>
+		library: Library<GenericMachine>,
+		registryPersistence?: RegistryPersistence
 	): Promise<GenericMachine> {
 
 		const MachineClass = library.getItem(config.library) ?? GenericMachine
 		const machine = new MachineClass(config.uid, config.configuration)
-		machine.init()
+		await machine.init(registryPersistence)
 
 		this.machines.set(config.uid, machine)
 
@@ -51,13 +54,14 @@ export class MachineCollection {
 	/** Loads machine configurations from persistency and creates all machines */
 	protected async init(
 		persistency: MachinesPersistencyYaml,
-		library: Library<GenericMachine>
+		library: Library<GenericMachine>,
+		registryPersistence?: RegistryPersistence
 	): Promise<void> {
 
 		const configs = await persistency.load()
 
 		for (const config of configs) {
-			await this.createMachine(config, library)
+			await this.createMachine(config, library, registryPersistence)
 		}
 	}
 

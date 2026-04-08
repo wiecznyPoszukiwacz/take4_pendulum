@@ -1,6 +1,6 @@
 {
   "name": "pendulum",
-  "version": "1.2.0",
+  "version": "1.6.0",
   "description": "",
   "license": "MIT",
   "author": "",
@@ -14,14 +14,16 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "imports": {
-	  "#types": "./src/Types.mts",
-	  "#genericMachine": "./dist/Core/StateMachines/Machines/GenericMachine.mjs"
+    "#types": "./src/Types.mts",
+    "#genericMachine": "./dist/Core/StateMachines/Machines/GenericMachine.mjs"
   },
   "dependencies": {
+    "ws": "^8.20.0",
     "yaml": "^2.8.0"
   },
   "devDependencies": {
     "@types/node": "^25.5.0",
+    "@types/ws": "^8.18.1",
     "typescript": "^6.0.0"
   }
 }

@@ -7,6 +7,9 @@ import { MachineRunner } from "../Core/StateMachines/Runners/GenericRunner.mjs"
 import { Library } from "../Core/Utils/Library.mjs"
 import { MachinesPersistencyYaml } from "../Core/Persistency/MachinesPersistency.mjs"
 import { GenericMachine } from "../Core/StateMachines/Machines/GenericMachine.mjs"
+import { ConsoleMonitor } from "../Core/Monitor/ConsoleMonitor.mjs"
+import { WebSocketMonitor } from "../Core/Monitor/WebSocketMonitor.mjs"
+import { JsonFileRegistryPersistence } from "../Core/Registry/Persistence/JsonFileRegistryPersistence.mjs"
 
 
 
@@ -14,12 +17,23 @@ export class Pendulum {
 
 	protected machineRunners: Map<string, MachineRunner>
 	protected machineCollection!: MachineCollection
+	protected consoleMonitor: ConsoleMonitor
+	protected webSocketMonitor: WebSocketMonitor
+	protected registryPersistence: JsonFileRegistryPersistence
 
 	protected runnerIds: Array<string>
 	public constructor() {
 
 		this.runnerIds = ['electricity', 'pressure', 'chemistry', 'mechanics']
 		this.machineRunners = new Map()
+		this.consoleMonitor = new ConsoleMonitor()
+		this.consoleMonitor.start()
+		this.webSocketMonitor = new WebSocketMonitor()
+		this.webSocketMonitor.start()
+		this.registryPersistence = new JsonFileRegistryPersistence(
+			resolve(fileURLToPath(import.meta.url), '../../../persistence')
+		)
+		this.registryPersistence.start()
 
 		this.init()
 	}
@@ -31,7 +45,7 @@ export class Pendulum {
 		const persistency = await MachinesPersistencyYaml.create(resolve(projectRoot, 'machines.yaml'))
 		const library = await Library.create(resolve(projectRoot, 'dist/Machinarium'), GenericMachine)
 
-		this.machineCollection = await MachineCollection.create(persistency, library)
+		this.machineCollection = await MachineCollection.create(persistency, library, this.registryPersistence)
 
 		for (const runnerName of this.runnerIds) {
 			await this.createRunner(runnerName)
