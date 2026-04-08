@@ -1,0 +1,5 @@
+method: setCell
+params:
+  machineUid: rainCollector
+  cellId: collectedWater
+  value: 42

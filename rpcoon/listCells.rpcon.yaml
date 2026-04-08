@@ -1,0 +1,3 @@
+method: listCells
+params:
+  machineUid: rainCollector

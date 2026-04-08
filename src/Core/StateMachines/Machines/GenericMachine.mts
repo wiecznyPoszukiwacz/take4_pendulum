@@ -5,6 +5,8 @@ import type { RegistryPersistence } from "../../Registry/Persistence/RegistryPer
 
 export class GenericMachine {
 
+	public static readonly typeCode: string = 'GENM'
+
 	#uid: string = ''
 	#unsubscribe: (() => void) | null = null
 	protected ticksElapsed: number = 0

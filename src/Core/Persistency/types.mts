@@ -10,3 +10,10 @@ export type TMachineConfig = {
 export type TMachinesFile = {
 	machines: Array<TMachineConfig>
 }
+
+/** Parameters for creating a new machine at runtime; uid is generated server-side */
+export type TCreateMachineParams = {
+	runner: string
+	library: string
+	configuration?: unknown
+}

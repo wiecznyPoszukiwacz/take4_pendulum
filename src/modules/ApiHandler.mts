@@ -1,4 +1,4 @@
-import { type TCellValue } from "#types"
+import { type TCellValue, type TRegistryCell } from "#types"
 import { isOk } from "../utils/Result.mjs"
 import { Pendulum } from "../pendulum/Pendulum.mjs"
 
@@ -42,6 +42,52 @@ export class ApiHandler {
 		const result = this.pendulum.readMachineSetup(params.machineUid, params.settingName)
 		if (!isOk(result)) throw new Error(result.error)
 		return result.value
+	}
+
+	/** Returns all registry cells for the given machine with their metadata */
+	public listCells(params: { machineUid: string }): TRegistryCell[] {
+		const result = this.pendulum.getMachineCells(params.machineUid)
+		if (!isOk(result)) throw new Error(result.error)
+		return result.value
+	}
+
+	/** Returns a single registry cell with metadata; returns null if cell not found */
+	public getCell(params: { machineUid: string; cellId: string }): TRegistryCell | null {
+		const result = this.pendulum.getMachineCell(params.machineUid, params.cellId)
+		if (!isOk(result)) throw new Error(result.error)
+		return result.value ?? null
+	}
+
+	/** Writes a value to a user-writable cell; returns previous value */
+	public setCell(params: { machineUid: string; cellId: string; value: TCellValue }): { previous: TCellValue | null } {
+		const result = this.pendulum.configureMachine(params.machineUid, params.cellId, params.value)
+		if (!isOk(result)) throw new Error(result.error)
+		return { previous: result.value }
+	}
+
+	/** Returns a snapshot of all cells in a machine's registry */
+	public getMachineSnapshot(params: { machineUid: string }): { uid: string; cells: TRegistryCell[] } {
+		const result = this.pendulum.getMachineCells(params.machineUid)
+		if (!isOk(result)) throw new Error(result.error)
+		return { uid: params.machineUid, cells: result.value }
+	}
+
+	/** Returns the names of all machine types available in the library */
+	public listMachineTypes(): string[] {
+		return this.pendulum.listMachineTypes()
+	}
+
+	/** Creates a new machine and registers it in the given runner; uid is generated server-side */
+	public async createMachine(params: { runner: string; library: string; configuration?: unknown }): Promise<{ uid: string }> {
+		const result = await this.pendulum.createMachine(params)
+		if (!isOk(result)) throw new Error(result.error)
+		return { uid: result.value }
+	}
+
+	/** Destroys and removes a machine from the collection and its runner */
+	public deleteMachine(params: { machineUid: string }): void {
+		const result = this.pendulum.deleteMachine(params.machineUid)
+		if (!isOk(result)) throw new Error(result.error)
 	}
 
 	/** Returns debug status of all machines */

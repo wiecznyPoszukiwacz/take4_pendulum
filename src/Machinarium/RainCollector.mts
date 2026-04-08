@@ -4,11 +4,13 @@ import { Container } from "./Utils/Container.mjs";
 
 export class RainCollector extends GenericMachine {
 
+	public static override readonly typeCode = 'RAIN'
+
 	protected collectedWater: number = 0
 	protected container!: Container
 
 	protected onCreate(): void {
-		this.registry.registerSetting('collectedWater' as TCellId, false, 0 as TCellValue)
+		this.registry.registerSetting('collectedWater' as TCellId, { initialValue: 0 as TCellValue })
 
 		console.log('onCreate w rain collector')
 		this.container = new Container(this.registry, 'collectedWater' as TCellId)

@@ -1,0 +1,3 @@
+method: getMachineSnapshot
+params:
+  machineUid: rainCollector

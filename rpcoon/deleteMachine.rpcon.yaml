@@ -1,0 +1,3 @@
+method: deleteMachine
+params:
+  machineUid: rainCollector2

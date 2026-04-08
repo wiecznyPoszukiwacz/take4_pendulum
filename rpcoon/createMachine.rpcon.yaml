@@ -1,0 +1,6 @@
+method: createMachine
+params:
+  runner: electricity
+  library: RainCollector
+  configuration:
+    area: 2

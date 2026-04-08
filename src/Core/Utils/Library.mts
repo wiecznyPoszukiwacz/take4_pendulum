@@ -64,4 +64,9 @@ export class Library<T> {
 		return this.items.get(name)
 	}
 
+	/** Returns the names of all registered classes */
+	public listItems(): string[] {
+		return Array.from(this.items.keys())
+	}
+
 }

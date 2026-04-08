@@ -30,6 +30,16 @@ export class MachineRunner {
 		})
 	}
 
+	/** Adds a single machine to this runner at runtime */
+	public addMachine(machine: GenericMachine): void {
+		this.machines.set(machine.uid, machine)
+	}
+
+	/** Removes a machine from this runner by UID; returns false if not found */
+	public removeMachine(machineUid: string): boolean {
+		return this.machines.delete(machineUid)
+	}
+
 	public run() {
 
 		setInterval(() => {

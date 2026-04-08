@@ -1,5 +1,63 @@
 # Changelog
 
+## [1.10.0] - 2026-04-08
+
+### Added
+- `UidGenerator` (`src/Core/Utils/UidGenerator.mts`) — generates machine UIDs in `MCH-{XXXX}-{YYY}` format (4-letter typeCode + 3-char base62 counter, up to 238 328 per type); `seed()` initialises counters from existing UIDs on startup
+- `GenericMachine.typeCode` — static `'GENM'`; each subclass overrides with a 4-letter code
+- `RainCollector.typeCode` — static `'RAIN'`
+- `TCreateMachineParams` in `src/Core/Persistency/types.mts` — create request type without `uid`
+
+### Changed
+- `Pendulum` holds `UidGenerator`; seeds it from existing machine UIDs after YAML load
+- `Pendulum.createMachine()` accepts `TCreateMachineParams` (no `uid`); derives typeCode from library class, generates UID automatically
+- `ApiHandler.createMachine` no longer accepts `uid` in params
+- `rpcoon/createMachine.rpcon.yaml` — removed `uid` from example
+
+## [1.9.0] - 2026-04-08
+
+### Added
+- `Library.listItems()` — returns names of all registered machine classes
+- `MachineCollection.addMachine()` — public (formerly `protected createMachine()`); creates and registers a machine at runtime
+- `MachineCollection.removeMachine(uid)` — destroys a machine, removes it from the internal map and runner mapping
+- `MachineRunner.addMachine(machine)` — registers a single machine at runtime
+- `MachineRunner.removeMachine(uid)` — removes a machine from the runner by UID
+- `Pendulum.listMachineTypes()` — returns available machine class names from the library
+- `Pendulum.createMachine(config)` — creates and registers a machine in the collection and its target runner; returns `Result<uid, string>`
+- `Pendulum.deleteMachine(uid)` — destroys and removes a machine from collection and all runners; returns `Result<void, string>`
+- JSON-RPC method `listMachineTypes` — lists all available machine class names
+- JSON-RPC method `createMachine({ uid, runner, library, configuration? })` — creates a new machine at runtime
+- JSON-RPC method `deleteMachine({ machineUid })` — destroys and removes a machine at runtime
+
+### Changed
+- `Pendulum` stores `library` as a field so it can be reused for runtime machine creation
+- `MachineCollection.createMachine()` renamed to `addMachine()` and made `public`
+
+## [1.8.0] - 2026-04-08
+
+### Added
+- `Registry.listCells()` — public method returning all registered cells with their current values and metadata (`typeRules`, `userWritable`)
+- `Registry.getCell(name)` — public method returning a single cell by name, or `undefined` if not registered
+- `Pendulum.getMachineCells(machineUid)` — returns `Result<TRegistryCell[], string>` for the given machine
+- `Pendulum.getMachineCell(machineUid, cellId)` — returns `Result<TRegistryCell | undefined, string>` for a single cell
+- JSON-RPC method `listCells({ machineUid })` — lists all registry cells for a machine with full metadata
+- JSON-RPC method `getCell({ machineUid, cellId })` — returns a single cell with metadata, or `null` if not found
+- JSON-RPC method `setCell({ machineUid, cellId, value })` — writes a value via `userWrite`; returns `{ previous }` or RPC error on read-only/validation failure
+- JSON-RPC method `getMachineSnapshot({ machineUid })` — returns `{ uid, cells }` snapshot of the entire machine registry
+
+## [1.7.0] - 2026-04-08
+
+### Added
+- `TCellTypeRules` — discriminated union in `Types.mts` describing per-cell validation rules: `boolean`, `number` (with optional `min`/`max`), `string` (with optional `minLength`, `maxLength`, `pattern`)
+- `TCellOptions` — options object type replacing positional params in `registerSetting()`
+- `Registry.validate()` — private method checking a `TCellValue` against `TCellTypeRules`; used at registration and on every `write()`
+
+### Changed
+- `TRegistryCell` extended with optional `typeRules?: TCellTypeRules`
+- `Registry.registerSetting()` signature changed from `(name, userWritable, initialValue)` to `(name, options: TCellOptions)`; throws `Error` at startup if `initialValue` fails `typeRules` validation
+- `Registry.write()` now validates the incoming value against `cell.typeRules` and returns `Err` if validation fails (affects both `machineWrite` and `userWrite`)
+- `RainCollector.onCreate()` updated to use new `registerSetting` options-object API
+
 ## [1.6.0] - 2026-04-08
 
 ### Added

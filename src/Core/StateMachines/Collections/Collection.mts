@@ -30,7 +30,7 @@ export class MachineCollection {
 	}
 
 	/** Instantiates a single machine using library to resolve its class, then registers it in the collection */
-	protected async createMachine(
+	public async addMachine(
 		config: TMachineConfig,
 		library: Library<GenericMachine>,
 		registryPersistence?: RegistryPersistence
@@ -61,7 +61,7 @@ export class MachineCollection {
 		const configs = await persistency.load()
 
 		for (const config of configs) {
-			await this.createMachine(config, library, registryPersistence)
+			await this.addMachine(config, library, registryPersistence)
 		}
 	}
 
@@ -82,6 +82,21 @@ export class MachineCollection {
 	public getMachine(machineUid: string): Result<GenericMachine, string> {
 		const machine = this.machines.get(machineUid)
 		return machine ? ok(machine) : err(`Machine not found: ${machineUid}`)
+	}
+
+	/** Destroys the machine and removes it from the collection and runner mapping; returns Err if not found */
+	public removeMachine(machineUid: string): Result<void, string> {
+		const machine = this.machines.get(machineUid)
+		if (!machine) return err(`Machine not found: ${machineUid}`)
+
+		machine.destroy()
+		this.machines.delete(machineUid)
+
+		for (const [, uids] of this.machineRunnerMapping) {
+			uids.delete(machineUid)
+		}
+
+		return ok(undefined)
 	}
 
 	public debugGetAllMachines() {

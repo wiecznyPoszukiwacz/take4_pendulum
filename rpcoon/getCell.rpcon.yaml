@@ -1,0 +1,4 @@
+method: getCell
+params:
+  machineUid: rainCollector
+  cellId: collectedWater
